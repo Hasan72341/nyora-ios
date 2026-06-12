@@ -105,6 +105,7 @@
 		3E68B095CB0EABD6566AAD8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 106D49302F1D944B45142836 /* Assets.xcassets */; };
 		0FD76A8EEA44250B3E613CE6 /* Resources/parsers.bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 97A5D4B10232E6DCDF5F5D0C /* Resources/parsers.bundle.js */; };
 		AEE9A09DC21C6B57A7E3634C /* Resources/parsers_sources.json in Resources */ = {isa = PBXBuildFile; fileRef = 63844DCA045374BC755465D4 /* Resources/parsers_sources.json */; };
+		EAEAEAEA0000000000000002 /* Resources/env.sync in Resources */ = {isa = PBXBuildFile; fileRef = EAEAEAEA0000000000000001 /* Resources/env.sync */; };
 		A7933D8088BAFF65558595F1 /* NyoraWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18001003C45490B9DAEC063D /* NyoraWidgetsBundle.swift */; };
 		BD73E0CF1F622AF754D06CE8 /* RecentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6915536671DB97085ADBE76 /* RecentWidget.swift */; };
 		1E3A3B616AD90B8AA34CE629 /* ShelfWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E4826052B309A128B0CA68 /* ShelfWidget.swift */; };
@@ -243,6 +244,7 @@
 		106D49302F1D944B45142836 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Assets.xcassets"; path = "NyoraApp/Assets.xcassets"; sourceTree = "<group>"; };
 		97A5D4B10232E6DCDF5F5D0C /* parsers.bundle.js */ = {isa = PBXFileReference; lastKnownFileType = text; name = "parsers.bundle.js"; path = "NyoraApp/Resources/parsers.bundle.js"; sourceTree = "<group>"; };
 		63844DCA045374BC755465D4 /* parsers_sources.json */ = {isa = PBXFileReference; lastKnownFileType = text; name = "parsers_sources.json"; path = "NyoraApp/Resources/parsers_sources.json"; sourceTree = "<group>"; };
+		EAEAEAEA0000000000000001 /* env.sync */ = {isa = PBXFileReference; lastKnownFileType = text; name = "env.sync"; path = "NyoraApp/Resources/env.sync"; sourceTree = "<group>"; };
 		18001003C45490B9DAEC063D /* NyoraWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "NyoraWidgetsBundle.swift"; path = "NyoraWidgets/NyoraWidgetsBundle.swift"; sourceTree = "<group>"; };
 		C6915536671DB97085ADBE76 /* RecentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RecentWidget.swift"; path = "NyoraWidgets/RecentWidget.swift"; sourceTree = "<group>"; };
 		06E4826052B309A128B0CA68 /* ShelfWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ShelfWidget.swift"; path = "NyoraWidgets/ShelfWidget.swift"; sourceTree = "<group>"; };
@@ -376,6 +378,7 @@
 				106D49302F1D944B45142836 /* Assets.xcassets */,
 				97A5D4B10232E6DCDF5F5D0C /* parsers.bundle.js */,
 				63844DCA045374BC755465D4 /* parsers_sources.json */,
+				EAEAEAEA0000000000000001 /* env.sync */,
 			);
 			name = NyoraApp;
 			sourceTree = "<group>";
@@ -487,6 +490,7 @@
 				3E68B095CB0EABD6566AAD8C /* Assets.xcassets in Resources */,
 				0FD76A8EEA44250B3E613CE6 /* Resources/parsers.bundle.js in Resources */,
 				AEE9A09DC21C6B57A7E3634C /* Resources/parsers_sources.json in Resources */,
+				EAEAEAEA0000000000000002 /* Resources/env.sync in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,13 +9,30 @@ enum SupabaseConfig {
     // an env var or Info.plist entry can still override per build.
     static var url: String = {
         let v = ProcessInfo.processInfo.environment["SUPABASE_URL"]
-            ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String ?? ""
+            ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String ?? envSync["SUPABASE_URL"] ?? ""
         return v.isEmpty ? "https://fqguzcoytnbnjwaddakn.supabase.co" : v
     }()
     static var anonKey: String = {
         let v = ProcessInfo.processInfo.environment["SUPABASE_ANON_KEY"]
-            ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String ?? ""
+            ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String ?? envSync["SUPABASE_ANON_KEY"] ?? ""
         return v.isEmpty ? "sb_publishable_RZTcdZZlzb_UhYAxtB09AQ_URTEftE4" : v
+    }()
+
+    /// Parsed key=value pairs from the bundled env.sync (active, uncommented lines),
+    /// so a committed env file can override the baked defaults. Empty if absent.
+    private static let envSync: [String: String] = {
+        guard let fileURL = Bundle.main.url(forResource: "env", withExtension: "sync"),
+              let text = try? String(contentsOf: fileURL, encoding: .utf8) else { return [:] }
+        var map: [String: String] = [:]
+        for rawLine in text.split(separator: "\n", omittingEmptySubsequences: true) {
+            let line = rawLine.trimmingCharacters(in: .whitespaces)
+            if line.isEmpty || line.hasPrefix("#") { continue }
+            guard let eq = line.firstIndex(of: "=") else { continue }
+            let key = String(line[..<eq]).trimmingCharacters(in: .whitespaces)
+            let value = String(line[line.index(after: eq)...]).trimmingCharacters(in: .whitespaces)
+            if !key.isEmpty { map[key] = value }
+        }
+        return map
     }()
 
     static var accessToken: String {
