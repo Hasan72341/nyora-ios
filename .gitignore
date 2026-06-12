@@ -1,0 +1,24 @@
+# Xcode / SwiftPM build output
+build/
+DerivedData/
+.build/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+.swiftpm/configuration/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# macOS
+.DS_Store
+
+# CocoaPods / Carthage (if ever used)
+Pods/
+Carthage/Build/
+
+# Misc build artifacts
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip

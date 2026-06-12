@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  GoogleSignIn persists its auth session to the data-protection keychain,
+	  which needs the app to own a keychain access group. The root cause of
+	  "keychain error (Code: -2)" was that the build was unsigned
+	  (CODE_SIGNING_ALLOWED=NO) so NO entitlements were embedded at all. Build
+	  signed (ad-hoc on Simulator / the user's profile on a sideloaded device)
+	  so this group is embedded and SecItemAdd succeeds. Supabase tokens live in
+	  UserDefaults, not the keychain.
+	-->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>com.nyora.ios</string>
+	</array>
+</dict>
+</plist>
