@@ -132,6 +132,7 @@ final class LibraryStore {
         } else {
             self.snapshot = Snapshot()
         }
+        dedupeCategories()
     }
 
     private func persist() {
@@ -276,6 +277,52 @@ final class LibraryStore {
 
     func setCategories(_ ids: [String], for mangaId: Int64) {
         snapshot.mangaCategories["\(mangaId)"] = ids
+        persist()
+    }
+
+    /// Collapse duplicate same-title categories that accumulate across synced devices
+    /// (e.g. several "Read later" tabs each with a different id). Mirrors the Android
+    /// `repointDuplicateFavourites` / `softDeleteDuplicateCategories` cleanup.
+    ///
+    /// Among non-deleted categories, group by name. For each group of size > 1 the
+    /// canonical category is the member with the smallest id (String comparison).
+    /// Every other (duplicate) member is repointed in `mangaCategories` onto the
+    /// canonical id (deduped per manga) and then SOFT-deleted so the deletion
+    /// propagates through the existing Supabase push.
+    func dedupeCategories() {
+        let active = snapshot.categories.filter { $0.deletedAt == nil }
+        let groups = Dictionary(grouping: active, by: { $0.name })
+        // duplicateId -> canonicalId for every non-canonical member of a duplicate group.
+        var canonicalFor: [String: String] = [:]
+        for (_, members) in groups where members.count > 1 {
+            guard let canonical = members.map({ $0.id }).min() else { continue }
+            for member in members where member.id != canonical {
+                canonicalFor[member.id] = canonical
+            }
+        }
+        guard !canonicalFor.isEmpty else { return }   // nothing to collapse — skip persist
+
+        // (a) Repoint manga -> category associations onto the canonical id, deduped.
+        for (mangaId, ids) in snapshot.mangaCategories {
+            var changed = false
+            var seen = Set<String>()
+            var remapped: [String] = []
+            for id in ids {
+                let target = canonicalFor[id] ?? id
+                if target != id { changed = true }
+                if seen.insert(target).inserted { remapped.append(target) }
+                else { changed = true }   // collapsed a now-duplicate entry
+            }
+            if changed { snapshot.mangaCategories[mangaId] = remapped }
+        }
+
+        // (b) Soft-delete the duplicate categories so the deletion syncs out.
+        let now = Date()
+        for i in snapshot.categories.indices where canonicalFor[snapshot.categories[i].id] != nil {
+            snapshot.categories[i].deletedAt = now
+            snapshot.categories[i].updatedAt = now
+        }
+
         persist()
     }
 

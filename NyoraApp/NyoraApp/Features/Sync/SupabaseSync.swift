@@ -443,6 +443,8 @@ final class SupabaseSync {
                 store.syncInsertCategory(Category(id: id, name: title, updatedAt: updatedAt, deletedAt: nil))
             }
         }
+        // Collapse any duplicate-title categories that arrived from legacy per-device seeds.
+        store.dedupeCategories()
     }
 
     private func pullMangaCategories(store: LibraryStore, since: String) async {

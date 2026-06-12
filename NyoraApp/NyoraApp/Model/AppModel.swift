@@ -32,7 +32,7 @@ final class AppModel: ObservableObject {
         self.readLater = store.snapshot.readLater
         self.history = store.snapshot.history
         self.bookmarks = store.snapshot.bookmarks
-        self.categories = store.snapshot.categories
+        self.categories = store.snapshot.categories.filter { $0.deletedAt == nil }
         publishWidgets()
         
         // Initial sync
@@ -192,10 +192,10 @@ final class AppModel: ObservableObject {
     func categories(for mangaId: Int64) -> [String] { store.categories(for: mangaId) }
 
     func addCategory(_ name: String) {
-        store.addCategory(name: name); categories = store.snapshot.categories
+        store.addCategory(name: name); categories = store.snapshot.categories.filter { $0.deletedAt == nil }
     }
     func deleteCategory(_ id: String) {
-        store.deleteCategory(id); categories = store.snapshot.categories
+        store.deleteCategory(id); categories = store.snapshot.categories.filter { $0.deletedAt == nil }
     }
     func setCategories(_ ids: [String], for mangaId: Int64) {
         store.setCategories(ids, for: mangaId); objectWillChange.send()
@@ -228,7 +228,7 @@ final class AppModel: ObservableObject {
         favourites = store.snapshot.favourites
         history = store.snapshot.history
         bookmarks = store.snapshot.bookmarks
-        categories = store.snapshot.categories
+        categories = store.snapshot.categories.filter { $0.deletedAt == nil }
         updates = []
     }
 
@@ -312,7 +312,7 @@ final class AppModel: ObservableObject {
         self.favourites = store.snapshot.favourites
         self.history = store.snapshot.history
         self.bookmarks = store.snapshot.bookmarks
-        self.categories = store.snapshot.categories
+        self.categories = store.snapshot.categories.filter { $0.deletedAt == nil }
         self.readLater = store.snapshot.readLater
         publishWidgets()
     }
