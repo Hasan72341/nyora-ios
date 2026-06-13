@@ -1,0 +1,87 @@
+name: Release iOS
+
+# Builds the native SwiftUI app on a macOS runner and packages an UNSIGNED .ipa
+# for sideloading (AltStore / Sideloadly re-sign with the user's Apple ID), then
+# publishes it to a GitHub Release.
+#
+# env.sync is a bundled build input but is no longer committed (it held secrets),
+# so it's recreated from repo secrets before the build. The app also has baked
+# prod fallbacks, so sign-in works regardless.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: xcodebuild -version
+
+      - name: Recreate env.sync from secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+        run: |
+          mkdir -p NyoraApp/NyoraApp/Resources
+          {
+            echo "# Generated in CI from repo secrets — do not commit."
+            echo "SUPABASE_URL=$SUPABASE_URL"
+            echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+            echo "GOOGLE_SERVER_CLIENT_ID=$GOOGLE_SERVER_CLIENT_ID"
+          } > NyoraApp/NyoraApp/Resources/env.sync
+          echo "wrote env.sync ($(wc -l < NyoraApp/NyoraApp/Resources/env.sync) lines)"
+
+      - name: Build unsigned device app
+        working-directory: NyoraApp
+        run: |
+          xcodebuild \
+            -scheme Nyora \
+            -project NyoraApp.xcodeproj \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        run: |
+          set -e
+          VER="${GITHUB_REF_NAME#v}"
+          APP="NyoraApp/build/Build/Products/Release-iphoneos/Nyora.app"
+          test -d "$APP" || { echo "No .app produced"; exit 1; }
+          rm -rf Payload
+          mkdir Payload
+          cp -R "$APP" Payload/
+          zip -qry "Nyora-iOS-${VER}.ipa" Payload
+          ls -la "Nyora-iOS-${VER}.ipa"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nyora-ios-ipa
+          path: Nyora-iOS-*.ipa
+          if-no-files-found: error
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Nyora for iOS ${{ github.ref_name }}
+          files: Nyora-iOS-*.ipa
+          fail_on_unmatched_files: false
+          body: |
+            **Nyora for iOS & iPadOS ${{ github.ref_name }}** — native SwiftUI build.
+
+            > Unsigned `.ipa` for **sideloading** — install with AltStore or Sideloadly (they re-sign it with your Apple ID). Requires iOS/iPadOS 17+. Keep the bundle id `com.nyora.ios` so Google sign-in works.
+
+            A signed TestFlight build will follow once on the Apple Developer Program.
