@@ -22,3 +22,5 @@ Carthage/Build/
 *.ipa
 *.dSYM
 *.dSYM.zip
+.env.sync
+env.sync
